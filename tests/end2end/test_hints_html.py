@@ -120,8 +120,8 @@ def test_hints(test_name, zoom_text_only, zoom_level, find_implementation,
 
 
 @pytest.mark.skip  # Too flaky
-def test_word_hints_issue1393(quteproc, tmpdir):
-    dict_file = tmpdir / 'dict'
+def test_word_hints_issue1393(quteproc, temp_path):
+    dict_file = temp_path / 'dict'
     dict_file.write(textwrap.dedent("""
         alph
         beta

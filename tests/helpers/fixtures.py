@@ -158,7 +158,7 @@ def fake_web_tab(stubs, tab_registry, mode_manager, qapp):
 
 
 @pytest.fixture
-def greasemonkey_manager(monkeypatch, data_tmpdir):
+def greasemonkey_manager(monkeypatch, data_tmp_path):
     gm_manager = greasemonkey.GreasemonkeyManager()
     monkeypatch.setattr(greasemonkey, 'gm_manager', gm_manager)
 
@@ -178,6 +178,8 @@ def testdata_scheme(qapp):
 
     @qutescheme.add_handler('testdata')
     def handler(url):  # pylint: disable=unused-variable
+        #file_abs = pathlib.Path(__file__).parent.resolve()
+        #filename = file_abs / os.pardir / 'end2end' / url.path().lstrip('/')
         file_abs = os.path.abspath(os.path.dirname(__file__))
         filename = os.path.join(file_abs, os.pardir, 'end2end',
                                 url.path().lstrip('/'))
@@ -294,7 +296,7 @@ def configdata_init():
 
 
 @pytest.fixture
-def yaml_config_stub(config_tmpdir):
+def yaml_config_stub(config_tmp_path):
     """Fixture which provides a YamlConfig object."""
     return configfiles.YamlConfig()
 
@@ -509,12 +511,12 @@ def mode_manager(win_registry, config_stub, key_config_stub, qapp):
     objreg.delete('mode-manager', scope='window', window=0)
 
 
-def standarddir_tmpdir(folder, monkeypatch, tmpdir):
-    """Set tmpdir/config as the configdir.
+def standarddir_tmp_path(folder, monkeypatch, tmp_path):
+    """Set tmp_path/config as the configdir.
 
     Use this to avoid creating a 'real' config dir (~/.config/qute_test).
     """
-    confdir = tmpdir / folder
+    confdir = tmp_path / folder
     confdir.ensure(dir=True)
     if hasattr(standarddir, folder):
         monkeypatch.setattr(standarddir, folder,
@@ -523,30 +525,30 @@ def standarddir_tmpdir(folder, monkeypatch, tmpdir):
 
 
 @pytest.fixture
-def download_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/download as the downloaddir.
+def download_tmp_path(monkeypatch, tmp_path):
+    """Set tmp_path/download as the downloaddir.
 
     Use this to avoid creating a 'real' download dir (~/.config/qute_test).
     """
-    return standarddir_tmpdir('download', monkeypatch, tmpdir)
+    return standarddir_tmp_path('download', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def config_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/config as the configdir.
+def config_tmp_path(monkeypatch, tmp_path):
+    """Set tmp_path/config as the configdir.
 
     Use this to avoid creating a 'real' config dir (~/.config/qute_test).
     """
     monkeypatch.setattr(
         standarddir, 'config_py',
-        lambda **_kwargs: str(tmpdir / 'config' / 'config.py'))
-    return standarddir_tmpdir('config', monkeypatch, tmpdir)
+        lambda **_kwargs: str(tmp_path / 'config' / 'config.py'))
+    return standarddir_tmp_path('config', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def config_py_arg(tmpdir, monkeypatch):
+def config_py_arg(tmp_path, monkeypatch):
     """Set the config_py arg with a custom value for init."""
-    f = tmpdir / 'temp_config.py'
+    f = tmp_path / 'temp_config.py'
     monkeypatch.setattr(
         standarddir, 'config_py',
         lambda **_kwargs: str(f))
@@ -554,57 +556,58 @@ def config_py_arg(tmpdir, monkeypatch):
 
 
 @pytest.fixture
-def data_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/data as the datadir.
+def data_tmp_path(monkeypatch, tmp_path):
+    """Set tmp_path/data as the datadir.
 
     Use this to avoid creating a 'real' data dir (~/.local/share/qute_test).
     """
-    return standarddir_tmpdir('data', monkeypatch, tmpdir)
+    return standarddir_tmp_path('data', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def runtime_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/runtime as the runtime dir.
+def runtime_tmp_path(monkeypatch, tmp_path):
+    """Set tmp_path/runtime as the runtime dir.
 
     Use this to avoid creating a 'real' runtime dir.
     """
-    return standarddir_tmpdir('runtime', monkeypatch, tmpdir)
+    return standarddir_tmp_path('runtime', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def cache_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/cache as the cachedir.
+def cache_tmp_path(monkeypatch, tmp_path):
+    """Set tmp_path/cache as the cachedir.
 
     Use this to avoid creating a 'real' cache dir (~/.cache/qute_test).
     """
-    return standarddir_tmpdir('cache', monkeypatch, tmpdir)
+    return standarddir_tmp_path('cache', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def redirect_webengine_data(data_tmpdir, monkeypatch):
+def redirect_webengine_data(data_tmp_path, monkeypatch):
     """Set XDG_DATA_HOME and HOME to a temp location.
 
-    While data_tmpdir covers most cases by redirecting standarddir.data(), this
-    is not enough for places QtWebEngine references the data dir internally.
+    While data_tmp_path covers most cases by redirecting standarddir.data(),
+    this is not enough for places QtWebEngine references the data dir
+    internally.
     For these, we need to set the environment variable to redirect data access.
 
     We also set HOME as in some places, the home directory is used directly...
     """
-    monkeypatch.setenv('XDG_DATA_HOME', str(data_tmpdir))
-    monkeypatch.setenv('HOME', str(data_tmpdir))
+    monkeypatch.setenv('XDG_DATA_HOME', str(data_tmp_path))
+    monkeypatch.setenv('HOME', str(data_tmp_path))
 
 
 @pytest.fixture()
-def short_tmpdir():
+def short_tmp_path():
     """A short temporary directory for a XDG_RUNTIME_DIR."""
     with tempfile.TemporaryDirectory() as tdir:
         yield py.path.local(tdir)  # pylint: disable=no-member
 
 
 @pytest.fixture
-def init_sql(data_tmpdir):
+def init_sql(data_tmp_path):
     """Initialize the SQL module, and shut it down after the test."""
-    path = str(data_tmpdir / 'test.db')
+    path = str(data_tmp_path / 'test.db')
     sql.init(path)
     yield
     sql.close()
@@ -635,16 +638,16 @@ def model_validator(qtmodeltester):
 
 
 @pytest.fixture
-def download_stub(win_registry, tmpdir, stubs):
+def download_stub(win_registry, tmp_path, stubs):
     """Register a FakeDownloadManager."""
-    stub = stubs.FakeDownloadManager(tmpdir)
+    stub = stubs.FakeDownloadManager(tmp_path)
     objreg.register('qtnetwork-download-manager', stub)
     yield stub
     objreg.delete('qtnetwork-download-manager')
 
 
 @pytest.fixture
-def web_history(fake_save_manager, tmpdir, init_sql, config_stub, stubs,
+def web_history(fake_save_manager, tmp_path, init_sql, config_stub, stubs,
                 monkeypatch):
     """Create a WebHistory object."""
     config_stub.val.completion.timestamp_format = '%Y-%m-%d'
