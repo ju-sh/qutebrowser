@@ -117,7 +117,7 @@ def download_should_exist(filename, tmp_path):
                             "{size} bytes big"))
 def download_size(filename, size, tmp_path):
     path = tmp_path / 'downloads' / filename
-    assert path.size() == int(size)
+    assert path.stat().st_size == int(size)
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should contain "
