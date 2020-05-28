@@ -20,7 +20,7 @@
 """Steps for bdd-like tests."""
 
 import os
-import os.path
+import pathlib
 import re
 import sys
 import time
@@ -46,8 +46,7 @@ def _get_echo_exe_path():
         Path to the "echo"-utility.
     """
     if utils.is_windows:
-        return os.path.join(testutils.abs_datapath(), 'userscripts',
-                            'echo.bat')
+        return pathlib.Path(testutils.abs_datapath()) /'userscripts' / 'echo.bat'
     else:
         return 'echo'
 
@@ -388,14 +387,11 @@ def clear_ssl_errors(request, quteproc):
 @bdd.when("the documentation is up to date")
 def update_documentation():
     """Update the docs before testing :help."""
-    base_path = os.path.dirname(os.path.abspath(qutebrowser.__file__))
-    doc_path = os.path.join(base_path, 'html', 'doc')
-    script_path = os.path.join(base_path, '..', 'scripts')
+    base_path = pathlib.Path(qutebrowser.__file__).resolve().parent
+    doc_path = base_path / 'html' /' doc'
+    script_path = base_path / '..' / 'scripts'
 
-    try:
-        os.mkdir(doc_path)
-    except FileExistsError:
-        pass
+    doc_path.mkdir(exist_ok=True)
 
     files = os.listdir(doc_path)
     if files and all(docutils.docs_up_to_date(p) for p in files):
@@ -407,7 +403,7 @@ def update_documentation():
     except OSError:
         pytest.skip("Docs outdated and asciidoc unavailable!")
 
-    update_script = os.path.join(script_path, 'asciidoc2html.py')
+    update_script = script_path / 'asciidoc2html.py'
     subprocess.run([sys.executable, update_script], check=True)
 
 

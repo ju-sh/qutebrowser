@@ -91,8 +91,8 @@ class EditorPidWatcher(QObject):
         if self.has_pidfile:
             return
 
-        if self._pidfile.check():
-            if self._pidfile.read():
+        if self._pidfile.exists():
+            if self._pidfile.read_text():
                 self.has_pidfile = True
                 self.appeared.emit()
             else:
@@ -164,7 +164,7 @@ def save_editor_wait(tmp_path):
     pidfile = tmp_path / 'editor_pid'
     # give the "editor" process time to write its pid
     for _ in range(10):
-        if pidfile.check():
+        if pidfile.exists():
             break
         time.sleep(1)
     pid = int(pidfile.read())

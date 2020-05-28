@@ -104,13 +104,13 @@ def download_ssl_page(quteproc, ssl_server):
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should not exist"))
 def download_should_not_exist(filename, tmp_path):
     path = tmp_path / 'downloads' / filename
-    assert not path.check()
+    assert not path.exists()
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should exist"))
 def download_should_exist(filename, tmp_path):
     path = tmp_path / 'downloads' / filename
-    assert path.check()
+    assert path.exists()
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should be "
@@ -171,4 +171,4 @@ def delete_file(tmp_path, filename):
 def fifo_should_be_fifo(tmp_path):
     download_dir = tmp_path / 'downloads'
     assert download_dir.exists()
-    assert not os.path.isfile(str(download_dir / 'fifo'))
+    assert not (download_dir / 'fifo').is_file()
