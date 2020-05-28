@@ -33,7 +33,7 @@ from qutebrowser.utils import utils
 def collect_tests():
     basedir = pathlib.Path(__file__).parent
     datadir = basedir / 'data' / 'hints' / 'html'
-    files = [f for f in os.listdir(datadir) if f != 'README.md']
+    files = [f for f in os.listdir(str(datadir)) if f != 'README.md']
     return files
 
 
