@@ -55,7 +55,7 @@ class InvalidFile(Exception):
 def _parse_file(test_name):
     """Parse the given HTML file."""
     file_path = (pathlib.Path(__file__).parent.resolve() / 'data' / 'hints' /
-                 'html' / test_namek
+                 'html' / test_name)
     with open(file_path, 'r', encoding='utf-8') as html:
         soup = bs4.BeautifulSoup(html, 'html.parser')
 
