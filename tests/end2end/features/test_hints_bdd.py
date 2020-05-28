@@ -26,8 +26,8 @@ bdd.scenarios('hints.feature')
 
 
 @pytest.fixture(autouse=True)
-def set_up_word_hints(tmpdir, quteproc):
-    dict_file = tmpdir / 'dict'
+def set_up_word_hints(tmp_path, quteproc):
+    dict_file = tmp_path / 'dict'
     dict_file.write(textwrap.dedent("""
         one
         two

@@ -23,9 +23,9 @@ import pytest_bdd as bdd
 bdd.scenarios('misc.feature')
 
 
-@bdd.then(bdd.parsers.parse('the PDF {filename} should exist in the tmpdir'))
-def pdf_exists(quteproc, tmpdir, filename):
-    path = tmpdir / filename
+@bdd.then(bdd.parsers.parse('the PDF {filename} should exist in the tmp_path'))
+def pdf_exists(quteproc, tmp_path, filename):
+    path = tmp_path / filename
     data = path.read_binary()
     assert data.startswith(b'%PDF')
 

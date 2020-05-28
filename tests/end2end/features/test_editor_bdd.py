@@ -34,10 +34,10 @@ from qutebrowser.utils import utils
 
 @bdd.when(bdd.parsers.parse('I set up a fake editor replacing "{text}" by '
                             '"{replacement}"'))
-def set_up_editor_replacement(quteproc, server, tmpdir, text, replacement):
+def set_up_editor_replacement(quteproc, server, tmp_path, text, replacement):
     """Set up editor.command to a small python script doing a replacement."""
     text = text.replace('(port)', str(server.port))
-    script = tmpdir / 'script.py'
+    script = tmp_path / 'script.py'
     script.write(textwrap.dedent("""
         import sys
 
@@ -54,9 +54,9 @@ def set_up_editor_replacement(quteproc, server, tmpdir, text, replacement):
 
 
 @bdd.when(bdd.parsers.parse('I set up a fake editor returning "{text}"'))
-def set_up_editor(quteproc, tmpdir, text):
+def set_up_editor(quteproc, tmp_path, text):
     """Set up editor.command to a small python script inserting a text."""
-    script = tmpdir / 'script.py'
+    script = tmp_path / 'script.py'
     script.write(textwrap.dedent("""
         import sys
 
@@ -68,9 +68,9 @@ def set_up_editor(quteproc, tmpdir, text):
 
 
 @bdd.when(bdd.parsers.parse('I set up a fake editor returning empty text'))
-def set_up_editor_empty(quteproc, tmpdir):
+def set_up_editor_empty(quteproc, tmp_path):
     """Set up editor.command to a small python script inserting empty text."""
-    set_up_editor(quteproc, tmpdir, "")
+    set_up_editor(quteproc, tmp_path, "")
 
 
 class EditorPidWatcher(QObject):
@@ -100,17 +100,17 @@ class EditorPidWatcher(QObject):
 
 
 @pytest.fixture
-def editor_pid_watcher(tmpdir):
-    return EditorPidWatcher(tmpdir)
+def editor_pid_watcher(tmp_path):
+    return EditorPidWatcher(tmp_path)
 
 
 @bdd.when(bdd.parsers.parse('I set up a fake editor that writes "{text}" on '
                             'save'))
-def set_up_editor_wait(quteproc, tmpdir, text, editor_pid_watcher):
+def set_up_editor_wait(quteproc, tmp_path, text, editor_pid_watcher):
     """Set up editor.command to a small python script inserting a text."""
     assert not utils.is_windows
-    pidfile = tmpdir / 'editor_pid'
-    script = tmpdir / 'script.py'
+    pidfile = tmp_path / 'editor_pid'
+    script = tmp_path / 'script.py'
     script.write(textwrap.dedent("""
         import os
         import sys
@@ -148,9 +148,9 @@ def wait_editor(qtbot, editor_pid_watcher):
 
 
 @bdd.when(bdd.parsers.parse('I kill the waiting editor'))
-def kill_editor_wait(tmpdir):
+def kill_editor_wait(tmp_path):
     """Kill the waiting editor."""
-    pidfile = tmpdir / 'editor_pid'
+    pidfile = tmp_path / 'editor_pid'
     pid = int(pidfile.read())
     # windows has no SIGUSR1, but we don't run this on windows anyways
     # for posix, there IS a member so we need to ignore useless-suppression
@@ -159,9 +159,9 @@ def kill_editor_wait(tmpdir):
 
 
 @bdd.when(bdd.parsers.parse('I save without exiting the editor'))
-def save_editor_wait(tmpdir):
+def save_editor_wait(tmp_path):
     """Trigger the waiting editor to write without exiting."""
-    pidfile = tmpdir / 'editor_pid'
+    pidfile = tmp_path / 'editor_pid'
     # give the "editor" process time to write its pid
     for _ in range(10):
         if pidfile.check():

@@ -169,7 +169,7 @@ def clean_open_tabs(quteproc):
 
 
 @bdd.given('pdfjs is available')
-def pdfjs_available(data_tmpdir):
+def pdfjs_available(data_tmp_path):
     if not pdfjs.is_available():
         pytest.skip("No pdfjs installation found.")
 
@@ -240,7 +240,7 @@ def set_setting(quteproc, server, opt, value):
 
 
 @bdd.when(bdd.parsers.parse("I run {command}"))
-def run_command(quteproc, server, tmpdir, command):
+def run_command(quteproc, server, tmp_path, command):
     """Run a qutebrowser command.
 
     The suffix "with count ..." can be used to pass a count to the command.
@@ -260,7 +260,7 @@ def run_command(quteproc, server, tmpdir, command):
 
     command = command.replace('(port)', str(server.port))
     command = command.replace('(testdata)', testutils.abs_datapath())
-    command = command.replace('(tmpdir)', str(tmpdir))
+    command = command.replace('(tmp_path)', str(tmp_path))
     command = command.replace('(dirsep)', os.sep)
     command = command.replace('(echo-exe)', _get_echo_exe_path())
 

@@ -33,8 +33,8 @@ PROMPT_MSG = ("Asking question <qutebrowser.utils.usertypes.Question "
 
 
 @pytest.fixture
-def download_dir(tmpdir):
-    downloads = tmpdir / 'downloads'
+def download_dir(tmp_path):
+    downloads = tmp_path / 'downloads'
     downloads.ensure(dir=True)
     (downloads / 'subdir').ensure(dir=True)
     try:
@@ -70,8 +70,8 @@ def check_ssl():
 
 
 @bdd.when("the unwritable dir is unwritable")
-def check_unwritable(tmpdir):
-    unwritable = tmpdir / 'downloads' / 'unwritable'
+def check_unwritable(tmp_path):
+    unwritable = tmp_path / 'downloads' / 'unwritable'
     if os.access(str(unwritable), os.W_OK):
         # Docker container or similar
         pytest.skip("Unwritable dir was writable")
@@ -89,8 +89,8 @@ def wait_for_download_finished_name(quteproc, name):
 
 
 @bdd.when(bdd.parsers.parse('I wait for the download prompt for "{path}"'))
-def wait_for_download_prompt(tmpdir, quteproc, path):
-    full_path = path.replace('(tmpdir)', str(tmpdir)).replace('/', os.sep)
+def wait_for_download_prompt(tmp_path, quteproc, path):
+    full_path = path.replace('(tmp_path)', str(tmp_path)).replace('/', os.sep)
     quteproc.wait_for(message=PROMPT_MSG.format(full_path))
     quteproc.wait_for(message="Entering mode KeyMode.prompt "
                       "(reason: question asked)")
@@ -103,41 +103,41 @@ def download_ssl_page(quteproc, ssl_server):
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should not exist"))
-def download_should_not_exist(filename, tmpdir):
-    path = tmpdir / 'downloads' / filename
+def download_should_not_exist(filename, tmp_path):
+    path = tmp_path / 'downloads' / filename
     assert not path.check()
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should exist"))
-def download_should_exist(filename, tmpdir):
-    path = tmpdir / 'downloads' / filename
+def download_should_exist(filename, tmp_path):
+    path = tmp_path / 'downloads' / filename
     assert path.check()
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should be "
                             "{size} bytes big"))
-def download_size(filename, size, tmpdir):
-    path = tmpdir / 'downloads' / filename
+def download_size(filename, size, tmp_path):
+    path = tmp_path / 'downloads' / filename
     assert path.size() == int(size)
 
 
 @bdd.then(bdd.parsers.parse("The downloaded file {filename} should contain "
                             "{text}"))
-def download_contents(filename, text, tmpdir):
-    path = tmpdir / 'downloads' / filename
+def download_contents(filename, text, tmp_path):
+    path = tmp_path / 'downloads' / filename
     assert text in path.read()
 
 
 @bdd.then(bdd.parsers.parse('The download prompt should be shown with '
                             '"{path}"'))
-def download_prompt(tmpdir, quteproc, path):
-    full_path = path.replace('(tmpdir)', str(tmpdir)).replace('/', os.sep)
+def download_prompt(tmp_path, quteproc, path):
+    full_path = path.replace('(tmp_path)', str(tmp_path)).replace('/', os.sep)
     quteproc.wait_for(message=PROMPT_MSG.format(full_path))
     quteproc.send_cmd(':leave-mode')
 
 
 @bdd.when("I set a test python open_dispatcher")
-def default_open_dispatcher_python(quteproc, tmpdir):
+def default_open_dispatcher_python(quteproc, tmp_path):
     cmd = '{} -c "import sys; print(sys.argv[1])"'.format(
         shlex.quote(sys.executable))
     quteproc.set_setting('downloads.open_dispatcher', cmd)
@@ -164,12 +164,12 @@ def download_open_with_prompt(quteproc):
 
 
 @bdd.when(bdd.parsers.parse("I delete the downloaded file {filename}"))
-def delete_file(tmpdir, filename):
-    (tmpdir / 'downloads' / filename).remove()
+def delete_file(tmp_path, filename):
+    (tmp_path / 'downloads' / filename).remove()
 
 
 @bdd.then("the FIFO should still be a FIFO")
-def fifo_should_be_fifo(tmpdir):
-    download_dir = tmpdir / 'downloads'
+def fifo_should_be_fifo(tmp_path):
+    download_dir = tmp_path / 'downloads'
     assert download_dir.exists()
     assert not os.path.isfile(str(download_dir / 'fifo'))

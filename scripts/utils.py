@@ -20,14 +20,13 @@
 """Utility functions for scripts."""
 
 import os
-import os.path
 import pathlib
 
 
 # Import side-effects are an evil thing, but here it's okay so scripts using
 # colors work on Windows as well.
 try:
-    import colorama     # type: ignore
+    import colorama
 except ImportError:
     colorama = None
 else:
