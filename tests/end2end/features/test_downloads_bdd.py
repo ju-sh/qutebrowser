@@ -89,7 +89,7 @@ def wait_for_download_finished_name(quteproc, name):
 
 @bdd.when(bdd.parsers.parse('I wait for the download prompt for "{path}"'))
 def wait_for_download_prompt(tmp_path, quteproc, path):
-    full_path = path.replace('(tmp_path)', str(tmp_path)).replace('/', os.sep)
+    full_path = path.replace('(tmpdir)', str(tmp_path)).replace('/', os.sep)
     quteproc.wait_for(message=PROMPT_MSG.format(full_path))
     quteproc.wait_for(message="Entering mode KeyMode.prompt "
                       "(reason: question asked)")
@@ -130,7 +130,7 @@ def download_contents(filename, text, tmp_path):
 @bdd.then(bdd.parsers.parse('The download prompt should be shown with '
                             '"{path}"'))
 def download_prompt(tmp_path, quteproc, path):
-    full_path = path.replace('(tmp_path)', str(tmp_path)).replace('/', os.sep)
+    full_path = path.replace('(tmpdir)', str(tmp_path)).replace('/', os.sep)
     quteproc.wait_for(message=PROMPT_MSG.format(full_path))
     quteproc.send_cmd(':leave-mode')
 
