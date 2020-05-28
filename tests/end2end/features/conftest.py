@@ -29,6 +29,7 @@ import logging
 import collections
 import textwrap
 import subprocess
+import shutil
 
 import pytest
 import pytest_bdd as bdd
@@ -48,7 +49,7 @@ def _get_echo_exe_path():
     if utils.is_windows:
         return pathlib.Path(testutils.abs_datapath()) /'userscripts' / 'echo.bat'
     else:
-        return 'echo'
+        return shutil.which("echo")
 
 
 @pytest.hookimpl(hookwrapper=True)

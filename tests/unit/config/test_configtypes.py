@@ -212,17 +212,25 @@ class TestAll:
         """
         for _name, member in inspect.getmembers(configtypes, inspect.isclass):
             if member in [configtypes.BaseType, configtypes.MappingType,
-                          configtypes._Numeric]:
+                          configtypes._Numeric, configtypes.FontBase]:
                 pass
             elif (member is configtypes.List or
                   member is configtypes.ListOrValue):
-                yield functools.partial(member, valtype=configtypes.Int())
-                yield functools.partial(member, valtype=configtypes.Url())
+                yield pytest.param(
+                    functools.partial(member, valtype=configtypes.Int()),
+                    id=member.__name__ + '-Int')
+                yield pytest.param(
+                    functools.partial(member, valtype=configtypes.Url()),
+                    id=member.__name__ + '-Url')
             elif member is configtypes.Dict:
-                yield functools.partial(member, keytype=configtypes.String(),
-                                        valtype=configtypes.String())
+                yield pytest.param(
+                    functools.partial(member, keytype=configtypes.String(),
+                                      valtype=configtypes.String()),
+                    id=member.__name__)
             elif member is configtypes.FormatString:
-                yield functools.partial(member, fields=['a', 'b'])
+                yield pytest.param(
+                    functools.partial(member, fields=['a', 'b']),
+                    id=member.__name__)
             elif issubclass(member, configtypes.BaseType):
                 yield member
 
@@ -262,8 +270,15 @@ class TestAll:
                 configtypes.PercOrInt,  # ditto
         ]:
             return
-        if (isinstance(typ, configtypes.ListOrValue) and
-                isinstance(typ.valtype, configtypes.Int)):
+        elif (isinstance(typ, functools.partial) and
+              isinstance(typ.func, (configtypes.ListOrValue,
+                                    configtypes.List))):
+            # ListOrValue: "- /" -> "/"
+            # List: "- /" -> ["/"]
+            return
+        elif (isinstance(typ, configtypes.ListOrValue) and
+              isinstance(typ.valtype, configtypes.Int)):
+            # "00" -> "0"
             return
 
         assert converted == s
@@ -1032,6 +1047,10 @@ class TestInt:
         converted = typ.from_str(text)
         assert typ.to_str(converted) == text
 
+    def test_bounds_handling_unset(self, klass):
+        typ = klass(minval=1, maxval=2)
+        assert typ.to_py(usertypes.UNSET) is usertypes.UNSET
+
 
 class TestFloat:
 
@@ -1475,7 +1494,7 @@ class TestFont:
             klass().to_py(val)
 
     def test_defaults_replacement(self, klass, monkeypatch):
-        configtypes.Font.set_defaults(['Terminus'], '23pt')
+        configtypes.FontBase.set_defaults(['Terminus'], '23pt')
         if klass is configtypes.Font:
             expected = '23pt Terminus'
         elif klass is configtypes.QtFont:
@@ -2003,7 +2022,6 @@ class TestSearchEngineUrl:
 
     @pytest.mark.parametrize('val', [
         'foo',  # no placeholder
-        ':{}',  # invalid URL
         'foo{bar}baz{}',  # {bar} format string variable
         '{1}{}',  # numbered format string variable
         '{{}',  # invalid format syntax

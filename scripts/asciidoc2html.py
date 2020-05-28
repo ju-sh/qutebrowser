@@ -121,7 +121,7 @@ class AsciiDoc:
         src = root / filename
         assert self._website is not None    # for mypy
         dst = pathlib.Path(self._website)
-        dst = src.parent.relative_to('.') / (src.stem + ".html")
+        dst = dst / src.parent.relative_to('.') / (src.stem + ".html")
         dst.parent.mkdir(exist_ok=True)
 
         assert self._tempdir is not None    # for mypy
@@ -259,8 +259,9 @@ class AsciiDoc:
             subprocess.run(cmdline, check=True, env=env)
         except (subprocess.CalledProcessError, OSError) as e:
             self._failed = True
-            utils.print_col(str(e), 'red')
-            print("Keeping modified sources in {}.".format(self._homedir))
+            utils.print_error(str(e))
+            print("Keeping modified sources in {}.".format(self._homedir),
+                  file=sys.stderr)
             sys.exit(1)
 
 
@@ -284,9 +285,9 @@ def run(**kwargs) -> None:
     try:
         asciidoc.prepare()
     except FileNotFoundError:
-        utils.print_col("Could not find asciidoc! Please install it, or use "
-                        "the --asciidoc argument to point this script to the "
-                        "correct python/asciidoc.py location!", 'red')
+        utils.print_error("Could not find asciidoc! Please install it, or use "
+                          "the --asciidoc argument to point this script to "
+                          "the correct python/asciidoc.py location!")
         sys.exit(1)
 
     try:
