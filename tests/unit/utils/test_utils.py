@@ -821,8 +821,8 @@ class TestYaml:
     def test_load(self):
         assert utils.yaml_load("[1, 2]") == [1, 2]
 
-    def test_load_file(self, tmpdir):
-        tmpfile = tmpdir / 'foo.yml'
+    def test_load_file(self, temp_path):
+        tmpfile = temp_path / 'foo.yml'
         tmpfile.write('[1, 2]')
         with tmpfile.open(encoding='utf-8') as f:
             assert utils.yaml_load(f) == [1, 2]
@@ -830,8 +830,8 @@ class TestYaml:
     def test_dump(self):
         assert utils.yaml_dump([1, 2]) == '- 1\n- 2\n'
 
-    def test_dump_file(self, tmpdir):
-        tmpfile = tmpdir / 'foo.yml'
+    def test_dump_file(self, temp_path):
+        tmpfile = temp_path / 'foo.yml'
         with tmpfile.open('w', encoding='utf-8') as f:
             utils.yaml_dump([1, 2], f)
         assert tmpfile.read() == '- 1\n- 2\n'

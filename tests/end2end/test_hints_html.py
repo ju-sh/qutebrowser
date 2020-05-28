@@ -20,7 +20,7 @@
 """Test hints based on html files with special comments."""
 
 import os
-import os.path
+import pathlib
 import textwrap
 
 import attr
@@ -31,8 +31,8 @@ from qutebrowser.utils import utils
 
 
 def collect_tests():
-    basedir = os.path.dirname(__file__)
-    datadir = os.path.join(basedir, 'data', 'hints', 'html')
+    basedir = pathlib.Path(__file__).parent
+    datadir = basedir / 'data' / 'hints' / 'html'
     files = [f for f in os.listdir(datadir) if f != 'README.md']
     return files
 
@@ -54,8 +54,8 @@ class InvalidFile(Exception):
 
 def _parse_file(test_name):
     """Parse the given HTML file."""
-    file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                             'data', 'hints', 'html', test_name)
+    file_path = (pathlib.Path(__file__).parent.resolve() / 'data' / 'hints' /
+                 'html' / test_namek
     with open(file_path, 'r', encoding='utf-8') as html:
         soup = bs4.BeautifulSoup(html, 'html.parser')
 
@@ -120,8 +120,8 @@ def test_hints(test_name, zoom_text_only, zoom_level, find_implementation,
 
 
 @pytest.mark.skip  # Too flaky
-def test_word_hints_issue1393(quteproc, tmpdir):
-    dict_file = tmpdir / 'dict'
+def test_word_hints_issue1393(quteproc, temp_path):
+    dict_file = temp_path / 'dict'
     dict_file.write(textwrap.dedent("""
         alph
         beta

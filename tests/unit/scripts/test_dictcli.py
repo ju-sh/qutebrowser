@@ -59,13 +59,13 @@ def configdata_init():
 
 
 @pytest.fixture(autouse=True)
-def dict_tmpdir(tmpdir, monkeypatch):
-    monkeypatch.setattr(spell, 'dictionary_dir', lambda: str(tmpdir))
-    return tmpdir
+def dict_tmp_path(tmp_path, monkeypatch):
+    monkeypatch.setattr(spell, 'dictionary_dir', lambda: str(tmp_path))
+    return tmp_path
 
 
-def test_language(dict_tmpdir):
-    (dict_tmpdir / 'pl-PL-2-0.bdic').ensure()
+def test_language(dict_tmp_path):
+    (dict_tmp_path / 'pl-PL-2-0.bdic').ensure()
     assert english().local_filename is None
     assert polish()
 
@@ -82,9 +82,9 @@ def test_latest_yet():
     assert dictcli.latest_yet(code2file, 'en-US', 'en-US-8-0.bdic')
 
 
-def test_available_languages(dict_tmpdir, monkeypatch):
+def test_available_languages(dict_tmp_path, monkeypatch):
     for f in ['pl-PL-2-0.bdic', english().remote_filename]:
-        (dict_tmpdir / f).ensure()
+        (dict_tmp_path / f).ensure()
     monkeypatch.setattr(dictcli, 'language_list_from_api', lambda: [
         (lang.code, lang.remote_filename) for lang in langs()
     ])
@@ -118,7 +118,7 @@ def test_filter_languages():
         dictcli.filter_languages(langs(), ['pl-PL', 'en-GB'])
 
 
-def test_install(dict_tmpdir, monkeypatch):
+def test_install(dict_tmp_path, monkeypatch):
     # given
     monkeypatch.setattr(
         dictcli, 'download_dictionary',
@@ -128,17 +128,17 @@ def test_install(dict_tmpdir, monkeypatch):
     dictcli.install(langs())
 
     # then
-    installed_files = [f.basename for f in dict_tmpdir.listdir()]
+    installed_files = [f.basename for f in dict_tmp_path.listdir()]
     expected_files = [lang.remote_filename for lang in langs()]
     assert sorted(installed_files) == sorted(expected_files)
 
 
-def test_update(dict_tmpdir, monkeypatch):
+def test_update(dict_tmp_path, monkeypatch):
     # given
     monkeypatch.setattr(
         dictcli, 'download_dictionary',
         lambda _url, dest: py.path.local(dest).ensure())  # pylint: disable=no-member
-    (dict_tmpdir / 'pl-PL-2-0.bdic').ensure()
+    (dict_tmp_path / 'pl-PL-2-0.bdic').ensure()
     assert polish().local_version < polish().remote_version
 
     # when
@@ -148,7 +148,7 @@ def test_update(dict_tmpdir, monkeypatch):
     assert polish().local_version == polish().remote_version
 
 
-def test_remove_old(dict_tmpdir, monkeypatch):
+def test_remove_old(dict_tmp_path, monkeypatch):
     # given
     monkeypatch.setattr(
         dictcli, 'download_dictionary',
@@ -156,12 +156,12 @@ def test_remove_old(dict_tmpdir, monkeypatch):
     for f in ['pl-PL-2-0.bdic',
               polish().remote_filename,
               english().remote_filename]:
-        (dict_tmpdir / f).ensure()
+        (dict_tmp_path / f).ensure()
 
     # when
     dictcli.remove_old(langs())
 
     # then
-    installed_files = [f.basename for f in dict_tmpdir.listdir()]
+    installed_files = [f.basename for f in dict_tmp_path.listdir()]
     expected_files = [polish().remote_filename, english().remote_filename]
     assert sorted(installed_files) == sorted(expected_files)

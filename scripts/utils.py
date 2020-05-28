@@ -54,7 +54,7 @@ fg_colors = {
 bg_colors = {name: col + 10 for name, col in fg_colors.items()}
 
 
-def _esc(code):
+def _esc(code: int) -> str:
     """Get an ANSI color code based on a color number."""
     return '\033[{}m'.format(code)
 
@@ -73,20 +73,20 @@ def print_error(text):
     print_col(text, 'red', file=sys.stderr)
 
 
-def print_title(text):
+def print_title(text: str) -> None:
     """Print a title."""
     print()
     print_col("==================== {} ====================".format(text),
               'yellow')
 
 
-def print_subtitle(text):
+def print_subtitle(text: str) -> None:
     """Print a subtitle."""
     print_col("------ {} ------".format(text), 'cyan')
 
 
-def change_cwd():
+def change_cwd() -> None:
     """Change the scripts cwd if it was started inside the script folder."""
-    cwd = os.getcwd()
-    if os.path.split(cwd)[1] == 'scripts':
-        os.chdir(os.path.join(cwd, os.pardir))
+    cwd = pathlib.Path.cwd()
+    if cwd.name == 'scripts':
+        os.chdir(str(cwd / os.pardir))

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with qutebrowser.  If not, see <http://www.gnu.org/licenses/>.
 
-import os.path
+import pathlib
 
 import pytest_bdd as bdd
 bdd.scenarios('javascript.feature')
@@ -50,12 +50,9 @@ console.log("Script is running on " + window.location.pathname);
 @bdd.when(bdd.parsers.parse("I have a GreaseMonkey file saved for {stage} "
                             "with noframes {frameset}"))
 def create_greasemonkey_file(quteproc, stage, frameset):
-    script_path = os.path.join(quteproc.basedir, 'data', 'greasemonkey')
-    try:
-        os.mkdir(script_path)
-    except FileExistsError:
-        pass
-    file_path = os.path.join(script_path, 'test.user.js')
+    script_path = pathlib.Path(quteproc.basedir) / 'data' / 'greasemonkey'
+    script_path.mkdir(exist_ok=True)
+    file_path = script_path / 'test.user.js'
     if frameset == "set":
         frames = "@noframes"
     elif frameset == "unset":
