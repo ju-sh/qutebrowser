@@ -35,14 +35,13 @@ PROMPT_MSG = ("Asking question <qutebrowser.utils.usertypes.Question "
 @pytest.fixture
 def download_dir(tmp_path):
     downloads = tmp_path / 'downloads'
-    downloads.ensure(dir=True)
-    (downloads / 'subdir').ensure(dir=True)
+    (downloads / 'subdir').mkdir(parents=True, exist_ok=True)
     try:
         os.mkfifo(str(downloads / 'fifo'))
     except AttributeError:
         pass
     unwritable = downloads / 'unwritable'
-    unwritable.ensure(dir=True)
+    unwritable.mkdir(exist_ok=True)
     unwritable.chmod(0)
 
     yield downloads
