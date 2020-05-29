@@ -77,7 +77,7 @@ def temp_basedir_env(tmp_path, short_tmpdir):
     ]
 
     state_file = data_dir / 'qutebrowser' / 'state'
-    state_file.write_text('\n'.join(lines), encoding='utf-8', ensure=True)
+    state_file.write_text('\n'.join(lines), encoding='utf-8')
 
     env = {
         'XDG_DATA_HOME': str(data_dir),

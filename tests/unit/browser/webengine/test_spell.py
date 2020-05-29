@@ -146,6 +146,6 @@ class TestInit:
 
     def test_moving_existing_destdir(self, old_dict_dir, dict_dir,
                                      patch_new_qt):
-        dict_dir.ensure(dir=True)
+        dict_dir.mkdir(exist_ok=True)
         spell.init()
         assert not (dict_dir / 'somedict').exists()
