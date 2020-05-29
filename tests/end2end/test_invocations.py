@@ -51,18 +51,18 @@ def _base_args(config):
 
 
 @pytest.fixture
-def temp_basedir_env(tmpdir, short_tmpdir):
+def temp_basedir_env(tmp_path, short_tmpdir):
     """Return a dict of environment variables that fakes --temp-basedir.
 
     We can't run --basedir or --temp-basedir for some tests, so we mess with
     XDG_*_DIR to get things relocated.
     """
-    data_dir = tmpdir / 'data'
-    config_dir = tmpdir / 'config'
+    data_dir = tmp_path / 'data'
+    config_dir = tmp_path / 'config'
     runtime_dir = short_tmpdir / 'rt'
-    cache_dir = tmpdir / 'cache'
+    cache_dir = tmp_path / 'cache'
 
-    runtime_dir.ensure(dir=True)
+    assert runtime_dir.is_dir()
     runtime_dir.chmod(0o700)
 
     lines = [

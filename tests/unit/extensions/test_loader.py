@@ -69,8 +69,8 @@ def module(monkeypatch, request):
 
 def test_get_init_context(data_tmpdir, config_tmpdir, fake_args):
     ctx = loader._get_init_context()
-    assert str(ctx.data_dir) == data_tmpdir
-    assert str(ctx.config_dir) == config_tmpdir
+    assert str(ctx.data_dir) == str(data_tmpdir)
+    assert str(ctx.config_dir) == str(config_tmpdir)
     assert ctx.args == fake_args
 
 

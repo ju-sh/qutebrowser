@@ -162,7 +162,7 @@ def fake_web_tab(stubs, tab_registry, mode_manager, qapp):
 
 
 @pytest.fixture
-def greasemonkey_manager(monkeypatch, data_tmpdir):
+def greasemonkey_manager(monkeypatch, data_tmpdir): # Why use data_tmpdir here?
     gm_manager = greasemonkey.GreasemonkeyManager()
     monkeypatch.setattr(greasemonkey, 'gm_manager', gm_manager)
 
@@ -318,7 +318,7 @@ def configdata_init():
 
 
 @pytest.fixture
-def yaml_config_stub(config_tmpdir):
+def yaml_config_stub(config_tmpdir):    # Why use config_tmpdir here?
     """Fixture which provides a YamlConfig object."""
     return configfiles.YamlConfig()
 
@@ -533,13 +533,13 @@ def mode_manager(win_registry, config_stub, key_config_stub, qapp):
     objreg.delete('mode-manager', scope='window', window=0)
 
 
-def standarddir_tmpdir(folder, monkeypatch, tmpdir):
-    """Set tmpdir/config as the configdir.
+def standarddir_tmpdir(folder, monkeypatch, tmp_path) -> pathlib.Path:
+    """Set tmp_path/config as the configdir.
 
     Use this to avoid creating a 'real' config dir (~/.config/qute_test).
     """
-    confdir = tmpdir / folder
-    confdir.ensure(dir=True)
+    confdir = tmp_path / folder
+    confdir.mkdir(exist_ok=True)
     if hasattr(standarddir, folder):
         monkeypatch.setattr(standarddir, folder,
                             lambda **_kwargs: str(confdir))
@@ -547,24 +547,24 @@ def standarddir_tmpdir(folder, monkeypatch, tmpdir):
 
 
 @pytest.fixture
-def download_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/download as the downloaddir.
+def download_tmpdir(monkeypatch, tmp_path):
+    """Set tmp_path/download as the downloaddir.
 
     Use this to avoid creating a 'real' download dir (~/.config/qute_test).
     """
-    return standarddir_tmpdir('download', monkeypatch, tmpdir)
+    return standarddir_tmpdir('download', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def config_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/config as the configdir.
+def config_tmpdir(monkeypatch, tmp_path):
+    """Set tmp_path/config as the configdir.
 
     Use this to avoid creating a 'real' config dir (~/.config/qute_test).
     """
     monkeypatch.setattr(
         standarddir, 'config_py',
-        lambda **_kwargs: str(tmpdir / 'config' / 'config.py'))
-    return standarddir_tmpdir('config', monkeypatch, tmpdir)
+        lambda **_kwargs: str(tmp_path / 'config' / 'config.py'))
+    return standarddir_tmpdir('config', monkeypatch, tmp_path)
 
 
 @pytest.fixture
@@ -578,30 +578,30 @@ def config_py_arg(tmpdir, monkeypatch):
 
 
 @pytest.fixture
-def data_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/data as the datadir.
+def data_tmpdir(monkeypatch, tmp_path):
+    """Set tmp_path/data as the datadir.
 
     Use this to avoid creating a 'real' data dir (~/.local/share/qute_test).
     """
-    return standarddir_tmpdir('data', monkeypatch, tmpdir)
+    return standarddir_tmpdir('data', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def runtime_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/runtime as the runtime dir.
+def runtime_tmpdir(monkeypatch, tmp_path):
+    """Set tmp_path/runtime as the runtime dir.
 
     Use this to avoid creating a 'real' runtime dir.
     """
-    return standarddir_tmpdir('runtime', monkeypatch, tmpdir)
+    return standarddir_tmpdir('runtime', monkeypatch, tmp_path)
 
 
 @pytest.fixture
-def cache_tmpdir(monkeypatch, tmpdir):
-    """Set tmpdir/cache as the cachedir.
+def cache_tmpdir(monkeypatch, tmp_path):
+    """Set tmp_path/cache as the cachedir.
 
     Use this to avoid creating a 'real' cache dir (~/.cache/qute_test).
     """
-    return standarddir_tmpdir('cache', monkeypatch, tmpdir)
+    return standarddir_tmpdir('cache', monkeypatch, tmp_path)
 
 
 @pytest.fixture
@@ -622,7 +622,7 @@ def redirect_webengine_data(data_tmpdir, monkeypatch):
 def short_tmpdir():
     """A short temporary directory for a XDG_RUNTIME_DIR."""
     with tempfile.TemporaryDirectory() as tdir:
-        yield py.path.local(tdir)  # pylint: disable=no-member
+        yield pathlib.Path(tdir)
 
 
 @pytest.fixture

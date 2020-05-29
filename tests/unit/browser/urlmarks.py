@@ -120,7 +120,7 @@ def test_save(bm_file, fake_save_manager, qtbot):
     bm.add(QUrl('http://example.com'), 'Example Site')
     bm.add(QUrl('http://example.com/notitle'), '')
     bm.save()
-    assert bm_file.read().splitlines() == [
+    assert bm_file.read_text().splitlines() == [
         'http://example.com Example Site',
         'http://example.com/notitle ',
     ]

@@ -283,7 +283,7 @@ class TestYaml:
         mtime = None
         if old_config is not None:
             autoconfig.write(old_config)
-            mtime = autoconfig.fobj.stat().mtime
+            mtime = autoconfig.fobj.stat().st_mtime
 
         yaml.load()
         yaml._save()
@@ -291,7 +291,7 @@ class TestYaml:
         if old_config is None:
             assert not autoconfig.fobj.exists()
         else:
-            assert autoconfig.fobj.stat().mtime == mtime
+            assert autoconfig.fobj.stat().st_mtime == mtime
 
     @pytest.mark.parametrize('line, text, exception', [
         ('%', 'While parsing', 'while scanning a directive'),
@@ -358,7 +358,7 @@ class TestYaml:
 
     @pytest.fixture
     def unreadable_autoconfig(self, autoconfig):
-        autoconfig.fobj.ensure()
+        assert autoconfig.fobj.is_file()
         autoconfig.fobj.chmod(0)
         if os.access(str(autoconfig.fobj), os.R_OK):
             # Docker container or similar
@@ -843,7 +843,7 @@ class TestConfigPy:
 
         See https://github.com/qutebrowser/qutebrowser/issues/3104
         """
-        (config_tmpdir / 'style.css').ensure()
+        assert (config_tmpdir / 'style.css').is_file()
         confpy.write('c.{}.append("{}")'.format(option, value))
         confpy.read()
         assert config.instance.get_obj(option)[-1] == value

@@ -376,9 +376,9 @@ def test_invalid_utf8_compiled(config_stub, config_tmpdir, data_tmpdir,
     monkeypatch.setattr(adblock.HostBlocker, 'update_files',
                         lambda _self: None)
 
-    (config_tmpdir / 'blocked-hosts').write_binary(
+    (config_tmpdir / 'blocked-hosts').write_bytes(
         b'https://www.example.org/\xa0')
-    (data_tmpdir / 'blocked-hosts').ensure()
+    assert (data_tmpdir / 'blocked-hosts').is_file()
 
     host_blocker = host_blocker_factory()
     with caplog.at_level(logging.ERROR):
