@@ -637,7 +637,7 @@ class TestWritePy:
 
     def test_existing_file(self, commands, tmp_path):
         confpy = tmp_path / 'config.py'
-        assert confpy.is_file()
+        confpy.touch()
 
         with pytest.raises(cmdutils.CommandError) as excinfo:
             commands.config_write_py(str(confpy))
@@ -647,7 +647,7 @@ class TestWritePy:
 
     def test_existing_file_force(self, commands, tmp_path):
         confpy = tmp_path / 'config.py'
-        assert confpy.is_file()
+        confpy.touch()
 
         commands.config_write_py(str(confpy), force=True)
 

@@ -62,7 +62,10 @@ def temp_basedir_env(tmp_path, short_tmpdir):
     runtime_dir = short_tmpdir / 'rt'
     cache_dir = tmp_path / 'cache'
 
-    assert runtime_dir.is_dir()
+    data_dir.mkdir(exist_ok=True)
+    config_dir.mkdir(exist_ok=True)
+    runtime_dir.mkdir(exist_ok=True)
+    cache_dir.mkdir(exist_ok=True)
     runtime_dir.chmod(0o700)
 
     lines = [

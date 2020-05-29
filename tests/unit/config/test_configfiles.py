@@ -358,7 +358,7 @@ class TestYaml:
 
     @pytest.fixture
     def unreadable_autoconfig(self, autoconfig):
-        assert autoconfig.fobj.is_file()
+        autoconfig.fobj.touch()
         autoconfig.fobj.chmod(0)
         if os.access(str(autoconfig.fobj), os.R_OK):
             # Docker container or similar
@@ -843,7 +843,7 @@ class TestConfigPy:
 
         See https://github.com/qutebrowser/qutebrowser/issues/3104
         """
-        assert (config_tmpdir / 'style.css').is_file()
+        (config_tmpdir / 'style.css').touch()
         confpy.write('c.{}.append("{}")'.format(option, value))
         confpy.read()
         assert config.instance.get_obj(option)[-1] == value

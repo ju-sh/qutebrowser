@@ -378,7 +378,7 @@ def test_invalid_utf8_compiled(config_stub, config_tmpdir, data_tmpdir,
 
     (config_tmpdir / 'blocked-hosts').write_bytes(
         b'https://www.example.org/\xa0')
-    assert (data_tmpdir / 'blocked-hosts').is_file()
+    (data_tmpdir / 'blocked-hosts').touch()
 
     host_blocker = host_blocker_factory()
     with caplog.at_level(logging.ERROR):
