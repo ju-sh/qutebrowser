@@ -83,7 +83,7 @@ class TestEarlyInit:
             if config_py == 'error':
                 config_py_lines.append('c.foo = 42')
             config_py_file.write_text('\n'.join(config_py_lines),
-                                      'utf-8', ensure=True)
+                                      'utf-8')
 
         with caplog.at_level(logging.ERROR):
             configinit.early_init(args)
@@ -147,7 +147,7 @@ class TestEarlyInit:
             ],
         }
         text = '\n'.join(yaml_lines[invalid_yaml])
-        autoconfig_file.write_text(text, 'utf-8', ensure=True)
+        autoconfig_file.write_text(text, 'utf-8')
 
         if config_py:
             config_py_lines = ['c.colors.hints.bg = "red"']
@@ -156,7 +156,7 @@ class TestEarlyInit:
             if config_py == 'error':
                 config_py_lines.append('c.foo = 42')
             config_py_file.write_text('\n'.join(config_py_lines),
-                                      'utf-8', ensure=True)
+                                      'utf-8')
 
         with caplog.at_level(logging.ERROR):
             configinit.early_init(args)
@@ -369,11 +369,11 @@ class TestLateInit:
             lines = (["config_version: 2", "settings:"] +
                      ["  {}:\n    global:\n      '{}'".format(k, v)
                       for k, v in settings])
-            autoconfig_file.write_text('\n'.join(lines), 'utf-8', ensure=True)
+            autoconfig_file.write_text('\n'.join(lines), 'utf-8')
         elif method == 'py':
             config_py_file = config_tmpdir / 'config.py'
             lines = ["c.{} = '{}'".format(k, v) for k, v in settings]
-            config_py_file.write_text('\n'.join(lines), 'utf-8', ensure=True)
+            config_py_file.write_text('\n'.join(lines), 'utf-8')
 
         configinit.early_init(args)
         configinit.late_init(fake_save_manager)
