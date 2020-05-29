@@ -33,6 +33,7 @@ import unittest.mock
 import types
 import mimetypes
 import os.path
+import pathlib
 
 import attr
 import pytest
