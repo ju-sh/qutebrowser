@@ -37,7 +37,6 @@ import pathlib
 
 import attr
 import pytest
-import py.path  # pylint: disable=no-name-in-module
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from PyQt5.QtNetwork import QNetworkCookieJar
@@ -163,7 +162,7 @@ def fake_web_tab(stubs, tab_registry, mode_manager, qapp):
 
 
 @pytest.fixture
-def greasemonkey_manager(monkeypatch, data_tmpdir): # Why use data_tmpdir here?
+def greasemonkey_manager(monkeypatch, data_tmpdir):  # Why use data_tmpdir here?
     gm_manager = greasemonkey.GreasemonkeyManager()
     monkeypatch.setattr(greasemonkey, 'gm_manager', gm_manager)
 
@@ -408,7 +407,7 @@ def status_command_stub(stubs, qtbot, win_registry):
 
 
 @pytest.fixture(scope='session')
-def stubs():
+def stubs():    # Why not directly use the module?
     """Provide access to stub objects useful for testing."""
     return stubsmod
 
@@ -569,9 +568,9 @@ def config_tmpdir(monkeypatch, tmp_path):
 
 
 @pytest.fixture
-def config_py_arg(tmpdir, monkeypatch):
+def config_py_arg(tmp_path, monkeypatch):
     """Set the config_py arg with a custom value for init."""
-    f = tmpdir / 'temp_config.py'
+    f = tmp_path / 'temp_config.py'
     monkeypatch.setattr(
         standarddir, 'config_py',
         lambda **_kwargs: str(f))
@@ -660,16 +659,16 @@ def model_validator(qtmodeltester):
 
 
 @pytest.fixture
-def download_stub(win_registry, tmpdir, stubs):
+def download_stub(win_registry, tmp_path, stubs):
     """Register a FakeDownloadManager."""
-    stub = stubs.FakeDownloadManager(tmpdir)
+    stub = stubs.FakeDownloadManager(tmp_path)
     objreg.register('qtnetwork-download-manager', stub)
     yield stub
     objreg.delete('qtnetwork-download-manager')
 
 
 @pytest.fixture
-def web_history(fake_save_manager, tmpdir, init_sql, config_stub, stubs,
+def web_history(fake_save_manager, tmp_path, init_sql, config_stub, stubs,
                 monkeypatch):
     """Create a WebHistory object."""
     config_stub.val.completion.timestamp_format = '%Y-%m-%d'
