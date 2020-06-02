@@ -58,7 +58,8 @@ class TestInit:
 
     @pytest.mark.parametrize('create_dir', [True, False])
     def test_with_standarddir(self, tmp_path, monkeypatch, create_dir):
-        monkeypatch.setattr(sessions.standarddir, 'data', lambda: str(tmp_path))
+        monkeypatch.setattr(sessions.standarddir, 'data',
+                            lambda: str(tmp_path))
         session_dir = tmp_path / 'sessions'
         if create_dir:
             session_dir.mkdir()

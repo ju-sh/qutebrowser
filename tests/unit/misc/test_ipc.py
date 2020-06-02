@@ -298,10 +298,10 @@ class TestListen:
     def test_permissions_posix(self, ipc_server):
         ipc_server.listen()
         sockfile = ipc_server._server.fullServerName()
-        sockdir = os.path.dirname(sockfile)
+        sockdir = pathlib.Path(sockfile).parent
 
         file_stat = os.stat(sockfile)
-        dir_stat = os.stat(sockdir)
+        dir_stat = sockdir.stat()
 
         # pylint: disable=no-member,useless-suppression
         file_owner_ok = file_stat.st_uid == os.getuid()

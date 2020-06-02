@@ -19,7 +19,7 @@
 
 """Tests for qutebrowser.misc.lineparser."""
 
-import os
+import pathlib
 from unittest import mock
 
 import pytest
@@ -66,7 +66,7 @@ class TestBaseLineParser:
             lineparser._write(f, [testdata])
 
         open_mock.assert_called_once_with(
-            os.path.join(self.CONFDIR, self.FILENAME), 'rb')
+            pathlib.Path(self.CONFDIR) / self.FILENAME, 'rb')
 
         open_mock().write.assert_has_calls([
             mock.call(testdata),
@@ -90,7 +90,8 @@ class TestLineParser:
         assert lineparser.data == ['one', 'two']
 
         (tmp_path / 'file').write_bytes(b'\xfe\n\xff\n')
-        lineparser = lineparsermod.LineParser(str(tmp_path), 'file', binary=True)
+        lineparser = lineparsermod.LineParser(str(tmp_path), 'file',
+                                              binary=True)
         assert lineparser.data == [b'\xfe', b'\xff']
 
     def test_clear(self, tmp_path, lineparser):
