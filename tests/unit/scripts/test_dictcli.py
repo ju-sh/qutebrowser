@@ -19,7 +19,9 @@
 # along with qutebrowser.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import py.path  # pylint: disable=no-name-in-module
+import os
+import pathlib
+
 import pytest
 
 from qutebrowser.browser.webengine import spell
@@ -59,13 +61,13 @@ def configdata_init():
 
 
 @pytest.fixture(autouse=True)
-def dict_tmpdir(tmpdir, monkeypatch):
-    monkeypatch.setattr(spell, 'dictionary_dir', lambda: str(tmpdir))
-    return tmpdir
+def dict_tmpdir(tmp_path, monkeypatch):
+    monkeypatch.setattr(spell, 'dictionary_dir', lambda: str(tmp_path))
+    return tmp_path
 
 
 def test_language(dict_tmpdir):
-    (dict_tmpdir / 'pl-PL-2-0.bdic').ensure()
+    (dict_tmpdir / 'pl-PL-2-0.bdic').touch()
     assert english().local_filename is None
     assert polish()
 
@@ -84,7 +86,7 @@ def test_latest_yet():
 
 def test_available_languages(dict_tmpdir, monkeypatch):
     for f in ['pl-PL-2-0.bdic', english().remote_filename]:
-        (dict_tmpdir / f).ensure()
+        (dict_tmpdir / f).touch()
     monkeypatch.setattr(dictcli, 'language_list_from_api', lambda: [
         (lang.code, lang.remote_filename) for lang in langs()
     ])
@@ -122,13 +124,13 @@ def test_install(dict_tmpdir, monkeypatch):
     # given
     monkeypatch.setattr(
         dictcli, 'download_dictionary',
-        lambda _url, dest: py.path.local(dest).ensure())  # pylint: disable=no-member
+        lambda _url, dest: pathlib.Path(dest).touch())
 
     # when
     dictcli.install(langs())
 
     # then
-    installed_files = [f.basename for f in dict_tmpdir.listdir()]
+    installed_files = [pathlib.Path(f).name for f in os.listdir()]
     expected_files = [lang.remote_filename for lang in langs()]
     assert sorted(installed_files) == sorted(expected_files)
 
@@ -137,8 +139,8 @@ def test_update(dict_tmpdir, monkeypatch):
     # given
     monkeypatch.setattr(
         dictcli, 'download_dictionary',
-        lambda _url, dest: py.path.local(dest).ensure())  # pylint: disable=no-member
-    (dict_tmpdir / 'pl-PL-2-0.bdic').ensure()
+        lambda _url, dest: pathlib.Path(dest).touch())
+    (dict_tmpdir / 'pl-PL-2-0.bdic').touch()
     assert polish().local_version < polish().remote_version
 
     # when
@@ -152,16 +154,16 @@ def test_remove_old(dict_tmpdir, monkeypatch):
     # given
     monkeypatch.setattr(
         dictcli, 'download_dictionary',
-        lambda _url, dest: py.path.local(dest).ensure())  # pylint: disable=no-member
+        lambda _url, dest: pathlib.Path(dest).touch())
     for f in ['pl-PL-2-0.bdic',
               polish().remote_filename,
               english().remote_filename]:
-        (dict_tmpdir / f).ensure()
+        (dict_tmpdir / f).touch()
 
     # when
     dictcli.remove_old(langs())
 
     # then
-    installed_files = [f.basename for f in dict_tmpdir.listdir()]
+    installed_files = [pathlib.Path(f).name for f in os.listdir()]
     expected_files = [polish().remote_filename, english().remote_filename]
     assert sorted(installed_files) == sorted(expected_files)
