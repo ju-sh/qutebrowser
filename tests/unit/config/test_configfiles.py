@@ -55,7 +55,7 @@ class AutoConfigHelper:
         self.write_toplevel(data)
 
     def write_raw(self, text):
-        self.fobj.write_text(text, encoding='utf-8')
+        self.fobj.write_text(text, encoding='utf-8', ensure=True)
 
     def read_toplevel(self):
         with self.fobj.open('r', encoding='utf-8') as f:
