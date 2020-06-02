@@ -20,6 +20,7 @@
 """Tests for qutebrowser.misc.ipc."""
 
 import os
+import pathlib
 import getpass
 import logging
 import json
