@@ -208,10 +208,10 @@ from qutebrowser.browser import pdfjs
          id='tux', parsed=version.Distribution.unknown,
          version=None, pretty='Multiline')),
 ])
-def test_distribution(tmpdir, monkeypatch, os_release, expected):
-    os_release_file = tmpdir / 'os-release'
+def test_distribution(tmp_path, monkeypatch, os_release, expected):
+    os_release_file = tmp_path / 'os-release'
     if os_release is not None:
-        os_release_file.write(textwrap.dedent(os_release))
+        os_release_file.write_text(textwrap.dedent(os_release))
     monkeypatch.setenv('QUTE_FAKE_OS_RELEASE', str(os_release_file))
 
     assert version.distribution() == expected
@@ -362,7 +362,7 @@ class TestGitStrSubprocess:
     """Tests for _git_str_subprocess."""
 
     @pytest.fixture
-    def git_repo(self, tmpdir):
+    def git_repo(self, tmp_path):
         """A fixture to create a temporary git repo.
 
         Some things are tested against a real repo so we notice if something in
@@ -384,20 +384,20 @@ class TestGitStrSubprocess:
                 # some environments on Windows...
                 # http://bugs.python.org/issue24493
                 subprocess.run(
-                    'git -C "{}" {}'.format(tmpdir, ' '.join(args)),
+                    'git -C "{}" {}'.format(tmp_path, ' '.join(args)),
                     env=env, check=True, shell=True)
             else:
                 subprocess.run(
-                    ['git', '-C', str(tmpdir)] + list(args),
+                    ['git', '-C', str(tmp_path)] + list(args),
                     check=True, env=env)
 
-        (tmpdir / 'file').write_text("Hello World!", encoding='utf-8')
+        (tmp_path / 'file').write_text("Hello World!", encoding='utf-8')
         _git('init')
         _git('add', 'file')
         _git('commit', '-am', 'foo', '--no-verify', '--no-edit',
              '--no-post-rewrite', '--quiet', '--no-gpg-sign')
         _git('tag', 'foobar')
-        return tmpdir
+        return tmp_path
 
     @needs_git
     def test_real_git(self, git_repo):
@@ -405,16 +405,16 @@ class TestGitStrSubprocess:
         ret = version._git_str_subprocess(str(git_repo))
         assert ret == '6e4b65a (1970-01-01 01:00:00 +0100)'
 
-    def test_missing_dir(self, tmpdir):
+    def test_missing_dir(self, tmp_path):
         """Test with a directory which doesn't exist."""
-        ret = version._git_str_subprocess(str(tmpdir / 'does-not-exist'))
+        ret = version._git_str_subprocess(str(tmp_path / 'does-not-exist'))
         assert ret is None
 
     @pytest.mark.parametrize('exc', [
         OSError,
         subprocess.CalledProcessError(1, 'foobar')
     ])
-    def test_exception(self, exc, mocker, tmpdir):
+    def test_exception(self, exc, mocker, tmp_path):
         """Test with subprocess.run raising an exception.
 
         Args:
@@ -424,7 +424,7 @@ class TestGitStrSubprocess:
         m.path.isdir.return_value = True
         mocker.patch('qutebrowser.utils.version.subprocess.run',
                      side_effect=exc)
-        ret = version._git_str_subprocess(str(tmpdir))
+        ret = version._git_str_subprocess(str(tmp_path))
         assert ret is None
 
 
