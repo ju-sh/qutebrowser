@@ -82,10 +82,10 @@ class TestFileHandling:
         editor._proc.finished.emit(0, QProcess.NormalExit)
         assert not os.path.exists(filename)
 
-    def test_existing_file(self, editor, tmpdir):
+    def test_existing_file(self, editor, tmp_path):
         """Test editing an existing file."""
-        path = tmpdir / 'foo.txt'
-        path.ensure()
+        path = tmp_path / 'foo.txt'
+        path.touch()
 
         editor.edit_file(str(path))
         editor._proc.finished.emit(0, QProcess.NormalExit)
@@ -136,15 +136,15 @@ class TestFileHandling:
         assert msg.text.startswith("Failed to read back edited file: ")
 
     @pytest.fixture
-    def unwritable_tmpdir(self, tmpdir):
-        tmpdir.chmod(0)
-        if os.access(str(tmpdir), os.W_OK):
+    def unwritable_tmpdir(self, tmp_path):
+        tmp_path.chmod(0)
+        if os.access(str(tmp_path), os.W_OK):
             # Docker container or similar
             pytest.skip("File was still writable")
 
-        yield tmpdir
+        yield tmp_path
 
-        tmpdir.chmod(0o755)
+        tmp_path.chmod(0o755)
 
     def test_unwritable(self, monkeypatch, message_mock, editor,
                         unwritable_tmpdir, caplog):
