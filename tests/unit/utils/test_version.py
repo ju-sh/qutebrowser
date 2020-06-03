@@ -22,7 +22,7 @@
 import io
 import sys
 import collections
-import os.path
+import pathlib
 import subprocess
 import contextlib
 import builtins  # noqa https://github.com/JBKahn/flake8-debugger/issues/20

@@ -21,7 +21,7 @@
 
 import sys
 import enum
-import os.path
+import pathlib
 import io
 import logging
 import functools
@@ -134,7 +134,7 @@ class TestReadFile:
 
     def test_readfile(self):
         """Read a test file."""
-        content = utils.read_file(os.path.join('utils', 'testfile'))
+        content = utils.read_file(str(pathlib.Path('utils') / 'testfile'))
         assert content.splitlines()[0] == "Hello World!"
 
     @pytest.mark.parametrize('filename', ['javascript/scroll.js',
@@ -147,7 +147,7 @@ class TestReadFile:
 
     def test_readfile_binary(self):
         """Read a test file in binary mode."""
-        content = utils.read_file(os.path.join('utils', 'testfile'),
+        content = utils.read_file(str(pathlib.Path('utils') / 'testfile')),
                                   binary=True)
         assert content.splitlines()[0] == b"Hello World!"
 
@@ -155,7 +155,7 @@ class TestReadFile:
 @pytest.mark.usefixtures('freezer')
 def test_resource_filename():
     """Read a test file."""
-    filename = utils.resource_filename(os.path.join('utils', 'testfile'))
+    filename = utils.resource_filename(str(pathlib.Path('utils') / 'testfile'))
     with open(filename, 'r', encoding='utf-8') as f:
         assert f.read().splitlines()[0] == "Hello World!"
 

@@ -20,6 +20,7 @@
 """Tests for qutebrowser.utils.urlutils."""
 
 import os.path
+import pathlib
 import logging
 
 import attr
@@ -176,7 +177,7 @@ class TestFuzzyUrl:
         os_mock.path.isabs.return_value = True
 
         url = urlutils.fuzzy_url('~/foo')
-        assert url == QUrl('file://' + os.path.expanduser('~/foo'))
+        assert url == QUrl('file://' + str(pathlib.Path('~/foo').expanduser()))
 
     def test_address(self, os_mock, is_url_mock):
         """Test passing something with relative=False."""

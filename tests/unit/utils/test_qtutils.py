@@ -22,7 +22,7 @@
 
 import io
 import os
-import os.path
+import pathlib
 import unittest
 import unittest.mock
 
@@ -850,7 +850,7 @@ class TestPyQIODevice:
             pyqiodev_failing.write(b'x')
 
     @pytest.mark.posix
-    @pytest.mark.skipif(not os.path.exists('/dev/full'),
+    @pytest.mark.skipif(not pathlib.Path('/dev/full').exists(),
                         reason="Needs /dev/full.")
     def test_write_error_real(self):
         """Test a real write error with /dev/full on supported systems."""
