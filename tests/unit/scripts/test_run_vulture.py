@@ -55,9 +55,9 @@ class VultureDir:
         files = list(self._tmp_path.glob('*'))
         assert files
         old_cwd = pathlib.Path.cwd()
-        os.chdir(self._tmp_path)
+        os.chdir(str(self._tmp_path))
         return_value = run_vulture.run([e.name for e in files])
-        os.chdir(old_cwd)
+        os.chdir(str(old_cwd))
         return return_value
 
     def makepyfile(self, **kwargs):
