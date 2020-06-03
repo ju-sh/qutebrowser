@@ -20,8 +20,8 @@
 """Tests for qutebrowser.utils.standarddir."""
 
 import os
-import pathlib
 import os.path
+import pathlib
 import sys
 import json
 import types
