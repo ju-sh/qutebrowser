@@ -130,7 +130,7 @@ def test_install(dict_tmpdir, monkeypatch):
     dictcli.install(langs())
 
     # then
-    installed_files = [f.name for f in pathlib.Path(dict_tmpdir).glob('*'))]
+    installed_files = [f.name for f in pathlib.Path(dict_tmpdir).glob('*')]
     expected_files = [lang.remote_filename for lang in langs()]
     assert sorted(installed_files) == sorted(expected_files)
 
