@@ -48,7 +48,7 @@ def search_expected(input_format):
 
 def sample_input(input_format):
     """Get the sample input path."""
-    return str(_samples / input_format / pathlib.Path('input'))
+    return str(pathlib.Path(_samples) / input_format / 'input')
 
 
 def test_opensearch_convert():
