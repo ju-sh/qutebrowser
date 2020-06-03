@@ -22,33 +22,27 @@ import pathlib
 import pytest
 from scripts import importer
 
-_samples = 'tests/unit/scripts/importer_sample'
+_samples = pathlib.Path('tests/unit/scripts/importer_sample')
 
 
 def qm_expected(input_format):
     """Read expected quickmark-formatted output."""
-    with open(pathlib.Path(_samples) / input_format / 'quickmarks',
-              'r', encoding='utf-8') as f:
-        return f.read()
+    return (_samples / input_format / 'quickmarks').read_text(encoding='utf-8')
 
 
 def bm_expected(input_format):
     """Read expected bookmark-formatted output."""
-    with open(pathlib.Path(_samples) / input_format / 'bookmarks',
-              'r', encoding='utf-8') as f:
-        return f.read()
+    return (_samples / input_format / 'bookmarks').read_text(encoding='utf-8')
 
 
 def search_expected(input_format):
     """Read expected search-formatted (config.py) output."""
-    with open(pathlib.Path(_samples) / input_format / 'config_py',
-              'r', encoding='utf-8') as f:
-        return f.read()
+    return (_samples / input_format / 'config_py').read_text(encoding='utf-8')
 
 
 def sample_input(input_format):
     """Get the sample input path."""
-    return str(pathlib.Path(_samples) / input_format / 'input')
+    return str(_samples / input_format / 'input')
 
 
 def test_opensearch_convert():
