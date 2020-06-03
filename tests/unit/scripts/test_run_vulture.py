@@ -64,7 +64,7 @@ class VultureDir:
         """Create a python file, similar to TestDir.makepyfile."""
         for filename, data in kwargs.items():
             text = textwrap.dedent(data)
-            (self._tmp_path / filename + '.py').write_text(text, 'utf-8')
+            (self._tmp_path / (filename + '.py')).write_text(text, 'utf-8')
 
 
 @pytest.fixture
