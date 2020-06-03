@@ -514,13 +514,13 @@ class TestSendToRunningInstance:
                 with qtbot.waitSignal(ipc_server.got_raw,
                                       timeout=5000) as raw_blocker:
                     old_cwd = pathlib.Path.cwd()
-                    os.chdir(tmp_path)
+                    os.chdir(str(tmp_path))
                     if not has_cwd:
                         m = mocker.patch('qutebrowser.misc.ipc.os')
                         m.getcwd.side_effect = OSError
                     sent = ipc.send_to_running_instance(
                         'qute-test', ['foo'], None)
-                    os.chdir(old_cwd)
+                    os.chdir(str(old_cwd))
 
         assert sent
 

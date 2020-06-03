@@ -66,7 +66,7 @@ class TestBaseLineParser:
             lineparser._write(f, [testdata])
 
         open_mock.assert_called_once_with(
-            pathlib.Path(self.CONFDIR) / self.FILENAME, 'rb')
+            str(pathlib.Path(self.CONFDIR) / self.FILENAME), 'rb')
 
         open_mock().write.assert_has_calls([
             mock.call(testdata),
