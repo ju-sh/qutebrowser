@@ -20,7 +20,7 @@
 """Tests for qutebrowser.utils.jinja."""
 
 import os
-import os.path
+import pathlib
 import logging
 
 import jinja2.exceptions
@@ -38,22 +38,22 @@ def patch_read_file(monkeypatch):
 
     def _read_file(path, binary=False):
         """A read_file which returns a simple template if the path is right."""
-        if path == os.path.join('html', 'test.html'):
+        if path == str(pathlib.Path('html') / 'test.html'):
             assert not binary
             return """Hello {{var}}"""
-        elif path == os.path.join('html', 'test2.html'):
+        elif path == str(pathlib.Path('html') / 'test2.html'):
             assert not binary
             return """{{ resource_url('utils/testfile') }}"""
-        elif path == os.path.join('html', 'test3.html'):
+        elif path == str(pathlib.Path('html') / 'test3.html'):
             assert not binary
             return """{{ data_url('testfile.txt') }}"""
         elif path == 'testfile.txt':
             assert binary
             return b'foo'
-        elif path == os.path.join('html', 'undef.html'):
+        elif path == str(pathlib.Path('html') / 'undef.html'):
             assert not binary
             return """{{ does_not_exist() }}"""
-        elif path == os.path.join('html', 'attributeerror.html'):
+        elif path == str(pathlib.Path('html') / 'attributeerror.html'):
             assert not binary
             return """{{ obj.foobar }}"""
         else:

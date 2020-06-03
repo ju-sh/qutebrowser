@@ -257,9 +257,9 @@ class GitStrSubprocessFake:
             raise ValueError("func got called without retval being set!")
         retval = self.retval
         self.retval = self.UNSET
-        gitpath = os.path.normpath(gitpath)
-        expected = os.path.abspath(os.path.join(
-            os.path.dirname(qutebrowser.__file__), os.pardir))
+        gitpath = str(pathlib.Path(gitpath).resolve())
+        expected = str((pathlib.Path(qutebrowser.__file__).parent /
+                        os.pardir).resolve())
         assert gitpath == expected
         return retval
 
@@ -930,10 +930,10 @@ class VersionParams:
 def test_version_info(params, stubs, monkeypatch, config_stub):
     """Test version.version_info()."""
     config.instance.config_py_loaded = params.config_py_loaded
-    import_path = os.path.abspath('/IMPORTPATH')
+    import_path = '/IMPORTPATH'
 
     patches = {
-        'qutebrowser.__file__': os.path.join(import_path, '__init__.py'),
+        'qutebrowser.__file__': str(pathlib.Path(import_path) / '__init__.py'),
         'qutebrowser.__version__': 'VERSION',
         '_git_str': lambda: ('GIT COMMIT' if params.git_commit else None),
         'platform.python_implementation': lambda: 'PYTHON IMPLEMENTATION',
