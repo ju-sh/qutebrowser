@@ -381,26 +381,26 @@ class TestSystemData:
     """Test system data path."""
 
     @pytest.mark.linux
-    def test_system_datadir_exist_linux(self, monkeypatch, tmpdir):
+    def test_system_datadir_exist_linux(self, monkeypatch, tmp_path):
         """Test that /usr/share/qute_test is used if path exists."""
-        monkeypatch.setenv('XDG_DATA_HOME', str(tmpdir))
+        monkeypatch.setenv('XDG_DATA_HOME', str(tmp_path))
         monkeypatch.setattr(os.path, 'exists', lambda path: True)
         standarddir._init_data(args=None)
         assert standarddir.data(system=True) == "/usr/share/qute_test"
 
     @pytest.mark.linux
-    def test_system_datadir_not_exist_linux(self, monkeypatch, tmpdir,
+    def test_system_datadir_not_exist_linux(self, monkeypatch, tmp_path,
                                             fake_args):
         """Test that system-wide path isn't used on linux if path not exist."""
-        fake_args.basedir = str(tmpdir)
+        fake_args.basedir = str(tmp_path)
         monkeypatch.setattr(os.path, 'exists', lambda path: False)
         standarddir._init_data(args=fake_args)
         assert standarddir.data(system=True) == standarddir.data()
 
-    def test_system_datadir_unsupportedos(self, monkeypatch, tmpdir,
+    def test_system_datadir_unsupportedos(self, monkeypatch, tmp_path,
                                           fake_args):
         """Test that system-wide path is not used on non-Linux OS."""
-        fake_args.basedir = str(tmpdir)
+        fake_args.basedir = str(tmp_path)
         monkeypatch.setattr('sys.platform', "potato")
         standarddir._init_data(args=fake_args)
         assert standarddir.data(system=True) == standarddir.data()
@@ -423,7 +423,7 @@ class TestMoveWindowsAndMacOS:
             str(files.auto_config_dir if auto else files.config_dir))
 
     @pytest.fixture
-    def files(self, tmpdir):
+    def files(self, tmp_path):
 
         @attr.s
         class Files:
@@ -434,17 +434,18 @@ class TestMoveWindowsAndMacOS:
             roaming_data_dir = attr.ib()
 
         return Files(
-            auto_config_dir=tmpdir / 'auto_config' / APPNAME,
-            config_dir=tmpdir / 'config' / APPNAME,
-            local_data_dir=tmpdir / 'data' / APPNAME,
-            roaming_data_dir=tmpdir / 'roaming-data' / APPNAME,
+            auto_config_dir=tmp_path / 'auto_config' / APPNAME,
+            config_dir=tmp_path / 'config' / APPNAME,
+            local_data_dir=tmp_path / 'data' / APPNAME,
+            roaming_data_dir=tmp_path / 'roaming-data' / APPNAME,
         )
 
     def test_move_macos(self, files):
         """Test moving configs on macOS."""
-        (files.auto_config_dir / 'autoconfig.yml').ensure()
-        (files.auto_config_dir / 'quickmarks').ensure()
-        files.config_dir.ensure(dir=True)
+        files.auto_config_dir.mkdir(parents=True)
+        (files.auto_config_dir / 'autoconfig.yml').touch()
+        (files.auto_config_dir / 'quickmarks').touch()
+        files.config_dir.mkdir(parents=True)
 
         standarddir._move_macos()
 
@@ -455,13 +456,18 @@ class TestMoveWindowsAndMacOS:
 
     def test_move_windows(self, files):
         """Test moving configs on Windows."""
-        (files.local_data_dir / 'data' / 'blocked-hosts').ensure()
-        (files.local_data_dir / 'qutebrowser.conf').ensure()
-        (files.local_data_dir / 'cache' / 'cachefile').ensure()
+        data_dir = files.local_data_dir / 'data'
+        cache_dir = files.local_data_dir / 'cache'
+        data_dir.mkdir(parents=True)
+        cache_dir.mkdir()
+        
+        (data_dir / 'blocked-hosts').touch()
+        (files.local_data_dir / 'qutebrowser.conf').touch()
+        (cache_dir / 'cachefile').touch()
 
         standarddir._move_windows()
 
-        assert (files.roaming_data_dir / 'data' / 'blocked-hosts').exists()
+        assert (data_dir / 'blocked-hosts').exists()
         assert (files.roaming_data_dir / 'config' /
                 'qutebrowser.conf').exists()
         assert not (files.roaming_data_dir / 'cache').exists()
@@ -471,7 +477,7 @@ class TestMoveWindowsAndMacOS:
 class TestMove:
 
     @pytest.fixture
-    def dirs(self, tmpdir):
+    def dirs(self, tmp_path):
         @attr.s
         class Dirs:
 
@@ -480,8 +486,8 @@ class TestMove:
             old_file = attr.ib()
             new_file = attr.ib()
 
-        old_dir = tmpdir / 'old'
-        new_dir = tmpdir / 'new'
+        old_dir = tmp_path / 'old'
+        new_dir = tmp_path / 'new'
         return Dirs(old=old_dir, new=new_dir,
                     old_file=old_dir / 'file', new_file=new_dir / 'file')
 
@@ -493,17 +499,17 @@ class TestMove:
 
     @pytest.mark.parametrize('empty_dest', [True, False])
     def test_moving_data(self, dirs, empty_dest):
-        dirs.old_file.ensure()
+        dirs.old_file.touch()
         if empty_dest:
-            dirs.new.ensure(dir=True)
+            dirs.new.mkdir()
 
         standarddir._move_data(str(dirs.old), str(dirs.new))
         assert not dirs.old_file.exists()
         assert dirs.new_file.exists()
 
     def test_already_existing(self, dirs, caplog):
-        dirs.old_file.ensure()
-        dirs.new_file.ensure()
+        dirs.old_file.touch()
+        dirs.new_file.touch()
 
         with caplog.at_level(logging.ERROR):
             standarddir._move_data(str(dirs.old), str(dirs.new))
@@ -516,7 +522,7 @@ class TestMove:
         """When there was an error it should be logged."""
         mock = mocker.Mock(side_effect=OSError('error'))
         monkeypatch.setattr(standarddir.shutil, 'move', mock)
-        dirs.old_file.ensure()
+        dirs.old_file.touch()
 
         with caplog.at_level(logging.ERROR):
             standarddir._move_data(str(dirs.old), str(dirs.new))
@@ -565,10 +571,10 @@ def test_init(mocker, tmpdir, monkeypatch, args_kind):
 
 
 @pytest.mark.linux
-def test_downloads_dir_not_created(monkeypatch, tmpdir):
+def test_downloads_dir_not_created(monkeypatch, tmp_path):
     """Make sure ~/Downloads is not created."""
-    download_dir = tmpdir / 'Downloads'
-    monkeypatch.setenv('HOME', str(tmpdir))
+    download_dir = tmp_path / 'Downloads'
+    monkeypatch.setenv('HOME', str(tmp_path))
     # Make sure xdg-user-dirs.dirs is not picked up
     monkeypatch.delenv('XDG_CONFIG_HOME', raising=False)
     standarddir._init_dirs()
@@ -576,7 +582,7 @@ def test_downloads_dir_not_created(monkeypatch, tmpdir):
     assert not download_dir.exists()
 
 
-def test_no_qapplication(qapp, tmpdir, monkeypatch):
+def test_no_qapplication(qapp, tmp_path, monkeypatch):
     """Make sure directories with/without QApplication are equal."""
     sub_code = """
         import sys
@@ -595,19 +601,19 @@ def test_no_qapplication(qapp, tmpdir, monkeypatch):
         locations = {k.name: v for k, v in standarddir._locations.items()}
         print(json.dumps(locations))
     """
-    pyfile = tmpdir / 'sub.py'
+    pyfile = tmp_path / 'sub.py'
     pyfile.write_text(textwrap.dedent(sub_code), encoding='ascii')
 
     for name in ['CONFIG', 'DATA', 'CACHE']:
         monkeypatch.delenv('XDG_{}_HOME'.format(name), raising=False)
 
-    runtime_dir = tmpdir / 'runtime'
-    runtime_dir.ensure(dir=True)
+    runtime_dir = tmp_path / 'runtime'
+    runtime_dir.mkdir()
     runtime_dir.chmod(0o0700)
     monkeypatch.setenv('XDG_RUNTIME_DIR', str(runtime_dir))
 
-    home_dir = tmpdir / 'home'
-    home_dir.ensure(dir=True)
+    home_dir = tmp_path / 'home'
+    home_dir.mkdir()
     monkeypatch.setenv('HOME', str(home_dir))
 
     proc = subprocess.run([sys.executable, str(pyfile)] + sys.path,
