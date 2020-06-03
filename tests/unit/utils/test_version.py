@@ -20,6 +20,7 @@
 """Tests for qutebrowser.utils.version."""
 
 import io
+import os
 import sys
 import collections
 import pathlib
